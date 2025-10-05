@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Toyobi Chiral Field v2</title>
+<title>Toyobi Field Poor-Code Version</title>
 <style>
 html, body {
   margin: 0;
@@ -48,10 +48,28 @@ html, body {
   75% { transform: rotateX(270deg) rotateY(180deg) rotateZ(240deg); }
   100% { transform: rotateX(360deg) rotateY(240deg) rotateZ(320deg); }
 }
+
+/* hidden/unopened template carrying taut pressure */
+template, script[type="application/json"] {
+  display: none;
+}
 </style>
 </head>
 <body>
 <div class="field" id="toyobiField"></div>
+
+<!-- Hidden data for field propagation -->
+<template id="tautPressureTemplate">
+  <div>Chiral node placeholder</div>
+</template>
+
+<script type="application/json" id="internetPressure">
+{
+  "source": "https://example.com/tautpressure",
+  "intensity": 1.0
+}
+</script>
+
 <script src="script.js"></script>
 </body>
 </html>
