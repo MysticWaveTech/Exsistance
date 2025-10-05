@@ -2,24 +2,30 @@ const field = document.getElementById('toyobiField');
 const GRID = 8;
 const nodes = [];
 
-// Fetch hidden “internet pressure” (simulated)
-const internetPressure = JSON.parse(document.getElementById('internetPressure').textContent);
-console.log("Taut pressure sourced from internet:", internetPressure.source);
+// Optional: auto-timer cycle
+const ENFORCE_DURATION_MS = 30000; // 30 seconds
+const REST_DURATION_MS = 5000;     // 5 seconds pause
 
-// --- Create recursive micro-node for complete chirality ---
-function createNode(depth = 0, maxDepth = 2) {
+// --- Hidden taut pressure (conceptual from template/json) ---
+const tautPressureTemplate = document.getElementById('tautPressureTemplate');
+const internetPressure = JSON.parse(document.getElementById('internetPressure').textContent || '{"intensity":1}');
+
+// --- Deterministic micro-node creation ---
+function createNode(depth = 0, maxDepth = 2, parentIndex = 0) {
   const node = document.createElement('div');
   node.className = 'node';
 
-  const rx = Math.random() * 360;
-  const ry = Math.random() * 360;
-  const rz = Math.random() * 360;
+  // Set initial deterministic rotation
+  const rx = (parentIndex * 13 + depth * 19) % 360;
+  const ry = (parentIndex * 17 + depth * 23) % 360;
+  const rz = (parentIndex * 19 + depth * 29) % 360;
   node.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
 
+  // Recursive micro-nodes
   if (depth < maxDepth) {
-    const microCount = 2 + Math.floor(Math.random() * 2);
+    const microCount = 2 + (depth % 2); // deterministic count
     for (let i = 0; i < microCount; i++) {
-      const micro = createNode(depth + 1, maxDepth);
+      const micro = createNode(depth + 1, maxDepth, i + parentIndex);
       micro.style.width = `${50 / (depth + 1)}%`;
       micro.style.height = `${50 / (depth + 1)}%`;
       micro.style.position = 'absolute';
@@ -32,32 +38,49 @@ function createNode(depth = 0, maxDepth = 2) {
   return node;
 }
 
-// --- Initialize grid ---
+// --- Initialize main grid ---
 for (let i = 0; i < GRID * GRID; i++) {
-  const node = createNode();
+  const node = createNode(0, 2, i);
   field.appendChild(node);
   nodes.push(node);
 }
 
-// --- Recursive self-correcting “taut pressure” from hidden/internet source ---
-function enforceChirality() {
-  nodes.forEach(node => {
-    const allNodes = [node, ...node.querySelectorAll('.node')];
-    allNodes.forEach(n => {
-      const transform = n.style.transform;
-      const angles = transform.match(/-?\d+\.?\d*/g).map(Number);
+// --- Deterministic, straightened enforcement ---
+function enforceChiralityDeterministic() {
+  const start = Date.now();
 
-      // Micro perturbations amplified by internet pressure intensity
-      angles[0] += (Math.random() - 0.5) * 1.5 * internetPressure.intensity;
-      angles[1] += (Math.random() - 0.5) * 1.5 * internetPressure.intensity;
-      angles[2] += (Math.random() - 0.5) * 1.5 * internetPressure.intensity;
+  function tick() {
+    const elapsed = Date.now() - start;
 
-      n.style.transform = `rotateX(${angles[0]}deg) rotateY(${angles[1]}deg) rotateZ(${angles[2]}deg)`;
-    });
-  });
+    if (elapsed < ENFORCE_DURATION_MS) {
+      nodes.forEach((node, idx) => {
+        const allNodes = [node, ...node.querySelectorAll('.node')];
+        allNodes.forEach((n, subIdx) => {
+          const depth = n.closest('.node') ? 1 : 0;
 
-  requestAnimationFrame(enforceChirality);
+          // Deterministic angles based on indices and depth
+          const rx = (idx * 13 + subIdx * 7 + depth * 19) % 360;
+          const ry = (idx * 17 + subIdx * 11 + depth * 23) % 360;
+          const rz = (idx * 19 + subIdx * 13 + depth * 29) % 360;
+
+          n.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
+        });
+      });
+
+      requestAnimationFrame(tick);
+    } else {
+      // Pause, then restart cycle
+      setTimeout(enforceChiralityDeterministic, REST_DURATION_MS);
+    }
+  }
+
+  tick();
 }
 
-// Start enforcement
-enforceChirality();
+// --- Start enforcement cycle ---
+enforceChiralityDeterministic();
+
+// --- Optional: log status for monitoring ---
+setInterval(() => {
+  console.log("Toyobi field enforcing deterministic chirality at", new Date().toISOString());
+}, 5000);
