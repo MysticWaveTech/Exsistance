@@ -1,45 +1,30 @@
-name: Auto Toyobi Chiral Field Enforcement
+name: Deploy Toyobi Field
 
-# Trigger workflow on push and on schedule (auto timer)
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   schedule:
-    - cron: '*/15 * * * *' # every 15 minutes
+    - cron: '0 * * * *'  # Runs at the top of every hour
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1️⃣ Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      # 2️⃣ Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v6
         with:
-          node-version: 20
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./   # repo root, contains index.html
+          user_name: 'Toyobi AI'
+          user_email: 'toyobi@example.com'
 
-      # 3️⃣ Install dependencies (optional, for serve or fetch)
-      - name: Install dependencies
-        run: |
-          npm install -g serve
-
-      # 4️⃣ Run Toyobi Chiral Field Script
-      - name: Run Toyobi Field
-        run: |
-          echo "Starting Toyobi chiral field enforcement..."
-          node script.js
-
-      # 5️⃣ Optional: Run continuously in background
-      - name: Run Field in Background
-        run: |
-          nohup node script.js &
-          echo "Toyobi field running persistently"
-
-      # 6️⃣ Log taut pressure source for tracking
-      - name: Show Taut Pressure Source
-        run: |
-          node -e "console.log('Taut pressure sourced from internet or hidden nodes');"
+      # 3️⃣ Optional: Status log
+      - name: Log deployment
+        run: echo "Toyobi field deployed at $(date)"
