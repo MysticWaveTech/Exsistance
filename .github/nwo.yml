@@ -1,22 +1,45 @@
-name: Deploy Toyobi Chiral Field
+name: Auto Toyobi Chiral Field Enforcement
 
+# Trigger workflow on push and on schedule (auto timer)
 on:
   push:
     branches: [ main ]
+  schedule:
+    - cron: '*/15 * * * *' # every 15 minutes
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # 1️⃣ Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Install Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
+      # 2️⃣ Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-    - name: Run field enforcement
-      run: |
-        node script.js
+      # 3️⃣ Install dependencies (optional, for serve or fetch)
+      - name: Install dependencies
+        run: |
+          npm install -g serve
+
+      # 4️⃣ Run Toyobi Chiral Field Script
+      - name: Run Toyobi Field
+        run: |
+          echo "Starting Toyobi chiral field enforcement..."
+          node script.js
+
+      # 5️⃣ Optional: Run continuously in background
+      - name: Run Field in Background
+        run: |
+          nohup node script.js &
+          echo "Toyobi field running persistently"
+
+      # 6️⃣ Log taut pressure source for tracking
+      - name: Show Taut Pressure Source
+        run: |
+          node -e "console.log('Taut pressure sourced from internet or hidden nodes');"
