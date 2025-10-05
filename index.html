@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Toyobi Chiral Field v2</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #0a0a0a 0%, #1a1a1a 100%);
+  overflow: hidden;
+}
+
+.field {
+  width: 80vmin;
+  height: 80vmin;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  perspective: 1000px;
+}
+
+.node {
+  width: 90%;
+  height: 90%;
+  margin: auto;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #ff0055 0deg 100deg,
+    #00ffaa 100deg 220deg,
+    #0055ff 220deg 360deg
+  );
+  transform-style: preserve-3d;
+  animation: twist 12s linear infinite;
+}
+
+@keyframes twist {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  25% { transform: rotateX(90deg) rotateY(60deg) rotateZ(80deg); }
+  50% { transform: rotateX(180deg) rotateY(120deg) rotateZ(160deg); }
+  75% { transform: rotateX(270deg) rotateY(180deg) rotateZ(240deg); }
+  100% { transform: rotateX(360deg) rotateY(240deg) rotateZ(320deg); }
+}
+</style>
+</head>
+<body>
+<div class="field" id="toyobiField"></div>
+<script src="script.js"></script>
+</body>
+</html>
